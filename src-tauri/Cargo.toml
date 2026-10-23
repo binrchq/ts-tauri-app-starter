@@ -1,0 +1,40 @@
+[package]
+name = "tauri-app-starter"
+version = "0.1.0"
+description = "Tauri + React + TypeScript desktop/mobile starter"
+authors = ["you"]
+license = "MIT"
+edition = "2021"
+
+[lib]
+name = "tauri_app_starter_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-os = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-shell = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4"] }
+chrono = { version = "0.4", features = ["clock"] }
+
+[target."cfg(not(any(target_os = \"android\", target_os = \"ios\")))".dependencies]
+tauri-plugin-window-state = "2"
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
+
+[profile.dev]
+debug = 1
+incremental = true
+
+[profile.release]
+codegen-units = 16
+strip = true

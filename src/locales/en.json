@@ -1,0 +1,160 @@
+{
+  "app": {
+    "name": "Tauri Starter",
+    "tagline": "Desktop & mobile starter",
+    "loading": "Starting up…",
+    "loadError": "Could not load application settings."
+  },
+  "nav": {
+    "dashboard": "Home",
+    "items": "Items",
+    "settings": "Settings"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "create": "Create",
+    "saveChanges": "Save changes",
+    "saving": "Saving…",
+    "working": "Working…",
+    "delete": "Delete",
+    "edit": "Edit",
+    "retry": "Retry"
+  },
+  "languages": {
+    "en": "English",
+    "zhCN": "简体中文"
+  },
+  "dashboard": {
+    "eyebrow": "Overview",
+    "title": "Welcome back",
+    "subtitle": "Everything you need to start building your own app.",
+    "platformLine": "Running on {{platform}} · v{{version}}",
+    "welcome": {
+      "title": "Create your first item",
+      "description": "Items are a placeholder domain: rename them and reuse the same end-to-end flow for your own data.",
+      "cta": "New item"
+    },
+    "count": {
+      "title": "Items stored",
+      "description": "Persisted locally through the Rust backend.",
+      "cta": "Browse items",
+      "unit": "items"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "description": "Theme is set to {{theme}}.",
+      "cta": "Customize"
+    },
+    "language": {
+      "title": "Language",
+      "description": "Interface language is {{language}}.",
+      "cta": "Change"
+    },
+    "tags": {
+      "title": "Tags in use"
+    },
+    "recent": {
+      "title": "Recent items",
+      "viewAll": "View all"
+    }
+  },
+  "items": {
+    "title": "Items",
+    "subtitle": "{{count}} item(s) stored on this device.",
+    "searchPlaceholder": "Search title, description or tag…",
+    "clearSearch": "Clear search",
+    "add": "New item",
+    "allTags": "All",
+    "pagination": "Page {{page}} of {{total}}",
+    "paginationPrevious": "Previous page",
+    "paginationNext": "Next page",
+    "empty": {
+      "title": "No items yet",
+      "description": "Create your first item to see how the UI, the API layer and the Rust backend work together.",
+      "action": "Create an item"
+    },
+    "noResults": {
+      "title": "No matching items",
+      "description": "Try a different search term or clear the active tag filter.",
+      "action": "Clear filters"
+    },
+    "delete": {
+      "title": "Delete item",
+      "description": "\"{{title}}\" will be permanently removed. This cannot be undone."
+    },
+    "form": {
+      "createTitle": "New item",
+      "createDescription": "Add a new record to the local store.",
+      "editTitle": "Edit item",
+      "editDescription": "Update this record and save your changes.",
+      "title": "Title",
+      "titlePlaceholder": "Give it a short, clear name",
+      "titleRequired": "A title is required.",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional details about this item",
+      "tags": "Tags",
+      "tagsPlaceholder": "design, backlog, idea",
+      "tagsHint": "Separate tags with commas. Up to 8 tags."
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Preferences are stored by the Rust backend and restored on launch.",
+    "appearance": {
+      "title": "Appearance",
+      "description": "Choose how the interface looks on this device.",
+      "theme": "Theme",
+      "surface": "Surface style",
+      "surfaceHint": "Liquid Glass uses real-time displacement on desktop and falls back to a frosted layer on mobile or with reduced motion.",
+      "compact": "Compact cards",
+      "compactDescription": "Show more items per row with tighter spacing."
+    },
+    "themeOptions": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "surfaceOptions": {
+      "solid": {
+        "label": "Solid",
+        "description": "Classic opaque cards."
+      },
+      "glass": {
+        "label": "Liquid Glass",
+        "description": "Translucent panels with refraction."
+      }
+    },
+    "language": {
+      "title": "Language",
+      "description": "Switch the interface language instantly.",
+      "label": "Interface language"
+    },
+    "list": {
+      "title": "Lists",
+      "description": "Control how many records appear per page.",
+      "pageSize": "Items per page",
+      "pageSizeOption": "{{count}} per page",
+      "pageSizeDescription": "Pagination appears automatically once there are more items."
+    },
+    "about": {
+      "title": "About",
+      "description": "Build information reported by the backend.",
+      "version": "Version",
+      "platform": "Platform",
+      "stack": "Stack"
+    },
+    "reset": {
+      "action": "Reset settings",
+      "description": "Restores theme, surface, language and list preferences to their defaults.",
+      "confirmTitle": "Reset all settings?",
+      "confirmDescription": "Your items are kept. Only preferences return to their default values."
+    }
+  },
+  "toast": {
+    "itemCreated": "Item created.",
+    "itemUpdated": "Item updated.",
+    "itemDeleted": "Item deleted.",
+    "settingsSaved": "Settings saved.",
+    "settingsReset": "Settings restored to defaults."
+  }
+}

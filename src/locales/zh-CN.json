@@ -1,0 +1,160 @@
+{
+  "app": {
+    "name": "Tauri Starter",
+    "tagline": "桌面与移动端脚手架",
+    "loading": "正在启动…",
+    "loadError": "无法加载应用设置。"
+  },
+  "nav": {
+    "dashboard": "首页",
+    "items": "条目",
+    "settings": "设置"
+  },
+  "common": {
+    "cancel": "取消",
+    "create": "创建",
+    "saveChanges": "保存修改",
+    "saving": "保存中…",
+    "working": "处理中…",
+    "delete": "删除",
+    "edit": "编辑",
+    "retry": "重试"
+  },
+  "languages": {
+    "en": "English",
+    "zhCN": "简体中文"
+  },
+  "dashboard": {
+    "eyebrow": "概览",
+    "title": "欢迎回来",
+    "subtitle": "构建你自己的应用所需的一切都已就绪。",
+    "platformLine": "运行于 {{platform}} · v{{version}}",
+    "welcome": {
+      "title": "创建第一个条目",
+      "description": "条目只是示例领域模型：重命名它，即可复用这条完整的端到端链路。",
+      "cta": "新建条目"
+    },
+    "count": {
+      "title": "已存条目",
+      "description": "通过 Rust 后端持久化到本地。",
+      "cta": "查看条目",
+      "unit": "条"
+    },
+    "appearance": {
+      "title": "外观",
+      "description": "当前主题：{{theme}}。",
+      "cta": "去设置"
+    },
+    "language": {
+      "title": "语言",
+      "description": "当前界面语言：{{language}}。",
+      "cta": "切换"
+    },
+    "tags": {
+      "title": "使用中的标签"
+    },
+    "recent": {
+      "title": "最近条目",
+      "viewAll": "查看全部"
+    }
+  },
+  "items": {
+    "title": "条目",
+    "subtitle": "本机已存储 {{count}} 个条目。",
+    "searchPlaceholder": "搜索标题、描述或标签…",
+    "clearSearch": "清除搜索",
+    "add": "新建条目",
+    "allTags": "全部",
+    "pagination": "第 {{page}} / {{total}} 页",
+    "paginationPrevious": "上一页",
+    "paginationNext": "下一页",
+    "empty": {
+      "title": "还没有条目",
+      "description": "创建第一个条目，即可看到界面、API 层与 Rust 后端是如何协同工作的。",
+      "action": "创建条目"
+    },
+    "noResults": {
+      "title": "没有匹配的条目",
+      "description": "换个关键词，或清除当前的标签筛选。",
+      "action": "清除筛选"
+    },
+    "delete": {
+      "title": "删除条目",
+      "description": "“{{title}}”将被永久删除，该操作无法撤销。"
+    },
+    "form": {
+      "createTitle": "新建条目",
+      "createDescription": "向本地存储中添加一条新记录。",
+      "editTitle": "编辑条目",
+      "editDescription": "修改这条记录并保存。",
+      "title": "标题",
+      "titlePlaceholder": "起一个简短清晰的名字",
+      "titleRequired": "标题不能为空。",
+      "description": "描述",
+      "descriptionPlaceholder": "关于该条目的补充说明（可选）",
+      "tags": "标签",
+      "tagsPlaceholder": "设计, 待办, 想法",
+      "tagsHint": "使用逗号分隔，最多 8 个标签。"
+    }
+  },
+  "settings": {
+    "title": "设置",
+    "subtitle": "偏好设置由 Rust 后端保存，并在下次启动时恢复。",
+    "appearance": {
+      "title": "外观",
+      "description": "选择本设备上的界面呈现方式。",
+      "theme": "主题",
+      "surface": "表面材质",
+      "surfaceHint": "液态玻璃在桌面端使用实时折射；移动端或开启“减少动态效果”时自动回退为毛玻璃。",
+      "compact": "紧凑卡片",
+      "compactDescription": "缩小间距，每行显示更多条目。"
+    },
+    "themeOptions": {
+      "light": "浅色",
+      "dark": "深色",
+      "system": "跟随系统"
+    },
+    "surfaceOptions": {
+      "solid": {
+        "label": "实色",
+        "description": "经典的不透明卡片。"
+      },
+      "glass": {
+        "label": "液态玻璃",
+        "description": "带折射效果的半透明面板。"
+      }
+    },
+    "language": {
+      "title": "语言",
+      "description": "即时切换界面语言。",
+      "label": "界面语言"
+    },
+    "list": {
+      "title": "列表",
+      "description": "控制每页显示的记录数量。",
+      "pageSize": "每页条目数",
+      "pageSizeOption": "每页 {{count}} 条",
+      "pageSizeDescription": "当条目数量超过该值时会自动显示分页。"
+    },
+    "about": {
+      "title": "关于",
+      "description": "由后端上报的构建信息。",
+      "version": "版本",
+      "platform": "平台",
+      "stack": "技术栈"
+    },
+    "reset": {
+      "action": "重置设置",
+      "description": "将主题、材质、语言与列表偏好恢复为默认值。",
+      "confirmTitle": "确定重置全部设置？",
+      "confirmDescription": "条目数据会被保留，仅偏好设置恢复默认值。"
+    }
+  },
+  "toast": {
+    "itemCreated": "条目已创建。",
+    "itemUpdated": "条目已更新。",
+    "itemDeleted": "条目已删除。",
+    "settingsSaved": "设置已保存。",
+    "settingsReset": "设置已恢复默认。"
+  }
+}
