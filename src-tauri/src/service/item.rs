@@ -2,7 +2,10 @@ use tauri::{AppHandle, State};
 
 use crate::{
     dao,
-    model::{AppState, Item, ItemInput},
+    model::{
+        item::{STATUS_ACTIVE, STATUS_ARCHIVED},
+        AppState, Item, ItemInput,
+    },
     service::app_state,
     util::time,
 };
@@ -12,7 +15,7 @@ const MAX_DESCRIPTION_LEN: usize = 2000;
 const MAX_TAGS: usize = 8;
 const MAX_TAG_LEN: usize = 24;
 
-/// Return the cached items (newest-first ordering is handled by the UI).
+/// Return the cached items (ordering is handled by the UI).
 pub fn list(state: &AppState) -> Vec<Item> {
     state.items.lock().unwrap().clone()
 }
@@ -32,6 +35,8 @@ pub async fn create(
         title,
         description: truncate(input.description.trim(), MAX_DESCRIPTION_LEN),
         tags: normalize_tags(input.tags),
+        favorite: input.favorite,
+        status: normalize_status(&input.status),
         created_at: now.clone(),
         updated_at: now,
     };
@@ -65,6 +70,8 @@ pub async fn update(
         item.title = title;
         item.description = truncate(input.description.trim(), MAX_DESCRIPTION_LEN);
         item.tags = normalize_tags(input.tags);
+        item.favorite = input.favorite;
+        item.status = normalize_status(&input.status);
         item.updated_at = time::now_iso();
         item.clone()
     };
@@ -73,11 +80,39 @@ pub async fn update(
     Ok(updated)
 }
 
-pub async fn delete(
+/// Lightweight partial update used by list/inspector toggles, so the UI does
+/// not have to send the whole record just to star or archive it.
+pub async fn patch(
     id: String,
+    favorite: Option<bool>,
+    status: Option<String>,
     app: AppHandle,
     state: State<'_, AppState>,
-) -> Result<(), String> {
+) -> Result<Item, String> {
+    app_state::ensure_items_loaded(&app, state.inner()).await?;
+
+    let updated = {
+        let mut items = state.items.lock().unwrap();
+        let item = items
+            .iter_mut()
+            .find(|item| item.id == id)
+            .ok_or_else(|| "item_not_found".to_string())?;
+
+        if let Some(favorite) = favorite {
+            item.favorite = favorite;
+        }
+        if let Some(status) = status {
+            item.status = normalize_status(&status);
+        }
+        item.updated_at = time::now_iso();
+        item.clone()
+    };
+
+    persist(&app, state.inner()).await?;
+    Ok(updated)
+}
+
+pub async fn delete(id: String, app: AppHandle, state: State<'_, AppState>) -> Result<(), String> {
     app_state::ensure_items_loaded(&app, state.inner()).await?;
 
     let removed = {
@@ -107,6 +142,14 @@ fn sanitize_title(raw: &str) -> Result<String, String> {
         return Err("title_required".to_string());
     }
     Ok(truncate(title, MAX_TITLE_LEN))
+}
+
+fn normalize_status(raw: &str) -> String {
+    if raw.eq_ignore_ascii_case(STATUS_ARCHIVED) {
+        STATUS_ARCHIVED.to_string()
+    } else {
+        STATUS_ACTIVE.to_string()
+    }
 }
 
 fn truncate(value: &str, max_chars: usize) -> String {
@@ -154,5 +197,13 @@ mod tests {
             "backlog".into(),
         ]);
         assert_eq!(tags, vec!["design".to_string(), "backlog".to_string()]);
+    }
+
+    #[test]
+    fn status_falls_back_to_active() {
+        assert_eq!(normalize_status("archived"), "archived");
+        assert_eq!(normalize_status("ARCHIVED"), "archived");
+        assert_eq!(normalize_status("nonsense"), "active");
+        assert_eq!(normalize_status(""), "active");
     }
 }

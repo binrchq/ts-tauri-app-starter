@@ -1,5 +1,6 @@
 import { useState, type ComponentType, type ReactNode } from 'react';
 import {
+  ArrowLeftIcon,
   ArrowPathIcon,
   ComputerDesktopIcon,
   CubeTransparentIcon,
@@ -24,6 +25,8 @@ export interface SettingsViewProps {
   appInfo: AppInfo | null;
   onUpdate: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => Promise<AppSettings>;
   onReset: () => Promise<AppSettings>;
+  onClose: () => void;
+  themeToggle?: ReactNode;
 }
 
 const themeOptions: Array<{ value: ThemePreference; icon: ComponentType<{ className?: string }> }> = [
@@ -37,7 +40,14 @@ const surfaceOptions: Array<{ value: SurfaceStyle; icon: ComponentType<{ classNa
   { value: 'glass', icon: CubeTransparentIcon },
 ];
 
-export function SettingsView({ settings, appInfo, onUpdate, onReset }: SettingsViewProps) {
+export function SettingsView({
+  settings,
+  appInfo,
+  onUpdate,
+  onReset,
+  onClose,
+  themeToggle,
+}: SettingsViewProps) {
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [resetOpen, setResetOpen] = useState(false);
@@ -82,16 +92,27 @@ export function SettingsView({ settings, appInfo, onUpdate, onReset }: SettingsV
   };
 
   return (
-    <div className="h-full overflow-y-auto">
-      <div className="page-pad mx-auto w-full max-w-3xl animate-fade-in space-y-5 px-5 lg:px-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50 lg:text-3xl">
-            {t('settings.title')}
-          </h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+    <div className="flex h-full min-h-0 flex-col">
+      <header className="flex h-16 shrink-0 items-center gap-3 border-b border-slate-200/70 bg-white/60 px-4 backdrop-blur-xl dark:border-white/8 dark:bg-slate-950/50 lg:px-6">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t('common.back')}
+          className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-900/6 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-white"
+        >
+          <ArrowLeftIcon className="h-5 w-5" />
+        </button>
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-base font-bold tracking-tight">{t('settings.title')}</h1>
+          <p className="truncate text-xs text-slate-500 dark:text-slate-400">
             {t('settings.subtitle')}
           </p>
         </div>
+        {themeToggle}
+      </header>
+
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="mx-auto w-full max-w-3xl animate-fade-in space-y-5 px-5 py-6 lg:px-8">
 
         {error && (
           <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
@@ -252,6 +273,7 @@ export function SettingsView({ settings, appInfo, onUpdate, onReset }: SettingsV
             {t('settings.reset.description')}
           </p>
         </SettingsSection>
+        </div>
       </div>
 
       <ConfirmDialog

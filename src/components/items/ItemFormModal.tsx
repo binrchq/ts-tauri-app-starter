@@ -16,6 +16,8 @@ export function ItemFormModal({ open, item, onClose, onSave }: ItemFormModalProp
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState('');
+  const [favorite, setFavorite] = useState(false);
+  const [archived, setArchived] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -24,6 +26,8 @@ export function ItemFormModal({ open, item, onClose, onSave }: ItemFormModalProp
     setTitle(item?.title ?? '');
     setDescription(item?.description ?? '');
     setTags(item?.tags.join(', ') ?? '');
+    setFavorite(item?.favorite ?? false);
+    setArchived(item?.status === 'archived');
     setError(null);
     setSaving(false);
   }, [open, item]);
@@ -48,6 +52,8 @@ export function ItemFormModal({ open, item, onClose, onSave }: ItemFormModalProp
           .split(/[,，]/)
           .map((tag) => tag.trim())
           .filter(Boolean),
+        favorite,
+        status: archived ? 'archived' : 'active',
       });
       onClose();
     } catch (cause) {
@@ -115,6 +121,21 @@ export function ItemFormModal({ open, item, onClose, onSave }: ItemFormModalProp
           <p className="text-xs text-slate-400 dark:text-slate-500">{t('items.form.tagsHint')}</p>
         </div>
 
+        <div className="space-y-4 rounded-xl border border-slate-200/70 p-4 dark:border-white/8">
+          <Toggle
+            label={t('items.form.favorite')}
+            hint={t('items.form.favoriteHint')}
+            checked={favorite}
+            onChange={setFavorite}
+          />
+          <Toggle
+            label={t('items.form.archived')}
+            hint={t('items.form.archivedHint')}
+            checked={archived}
+            onChange={setArchived}
+          />
+        </div>
+
         {error && (
           <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
             {error}
@@ -122,5 +143,40 @@ export function ItemFormModal({ open, item, onClose, onSave }: ItemFormModalProp
         )}
       </form>
     </Modal>
+  );
+}
+interface ToggleProps {
+  label: string;
+  hint: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}
+
+function Toggle({ label, hint, checked, onChange }: ToggleProps) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <div className="min-w-0">
+        <div className="text-sm font-medium text-slate-700 dark:text-slate-300">{label}</div>
+        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">{hint}</p>
+      </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        aria-label={label}
+        onClick={() => onChange(!checked)}
+        className={
+          'relative h-6 w-11 shrink-0 rounded-full transition-colors ' +
+          (checked ? 'bg-brand-600' : 'bg-slate-200 dark:bg-slate-700')
+        }
+      >
+        <span
+          className={
+            'absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ' +
+            (checked ? 'translate-x-[22px]' : 'translate-x-0.5')
+          }
+        />
+      </button>
+    </div>
   );
 }

@@ -49,6 +49,7 @@ pub fn run() {
             list_items,
             create_item,
             update_item,
+            patch_item,
             delete_item,
         ])
         .run(tauri::generate_context!())

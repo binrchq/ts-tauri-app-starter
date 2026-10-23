@@ -6,12 +6,12 @@
     "loadError": "Could not load application settings."
   },
   "nav": {
-    "dashboard": "Home",
-    "items": "Items",
     "settings": "Settings"
   },
   "common": {
+    "back": "Back",
     "cancel": "Cancel",
+    "close": "Close",
     "create": "Create",
     "saveChanges": "Save changes",
     "saving": "Saving…",
@@ -24,60 +24,45 @@
     "en": "English",
     "zhCN": "简体中文"
   },
-  "dashboard": {
-    "eyebrow": "Overview",
-    "title": "Welcome back",
-    "subtitle": "Everything you need to start building your own app.",
-    "platformLine": "Running on {{platform}} · v{{version}}",
-    "welcome": {
-      "title": "Create your first item",
-      "description": "Items are a placeholder domain: rename them and reuse the same end-to-end flow for your own data.",
-      "cta": "New item"
-    },
-    "count": {
-      "title": "Items stored",
-      "description": "Persisted locally through the Rust backend.",
-      "cta": "Browse items",
-      "unit": "items"
-    },
-    "appearance": {
-      "title": "Appearance",
-      "description": "Theme is set to {{theme}}.",
-      "cta": "Customize"
-    },
-    "language": {
-      "title": "Language",
-      "description": "Interface language is {{language}}.",
-      "cta": "Change"
-    },
-    "tags": {
-      "title": "Tags in use"
-    },
-    "recent": {
-      "title": "Recent items",
-      "viewAll": "View all"
-    }
+  "sidebar": {
+    "all": "All items",
+    "favorites": "Favorites",
+    "active": "Active",
+    "archived": "Archived",
+    "tags": "Tags",
+    "newItem": "New item",
+    "version": "Version {{version}}"
   },
-  "items": {
-    "title": "Items",
-    "subtitle": "{{count}} item(s) stored on this device.",
-    "searchPlaceholder": "Search title, description or tag…",
+  "workspace": {
+    "count": "{{count}} item(s)",
+    "new": "New",
+    "searchPlaceholder": "Search…",
     "clearSearch": "Clear search",
-    "add": "New item",
-    "allTags": "All",
-    "pagination": "Page {{page}} of {{total}}",
-    "paginationPrevious": "Previous page",
-    "paginationNext": "Next page",
+    "layout": {
+      "list": "List view",
+      "grid": "Grid view"
+    },
     "empty": {
       "title": "No items yet",
-      "description": "Create your first item to see how the UI, the API layer and the Rust backend work together.",
+      "description": "Create your first item to see the full flow: UI → typed API → Rust service → disk.",
       "action": "Create an item"
     },
     "noResults": {
-      "title": "No matching items",
-      "description": "Try a different search term or clear the active tag filter.",
+      "title": "Nothing matches",
+      "description": "Try a different search term, or clear the active filters.",
       "action": "Clear filters"
-    },
+    }
+  },
+  "inspector": {
+    "noDescription": "No description",
+    "noTags": "No tags",
+    "created": "Created",
+    "updated": "Updated",
+    "status": "Status",
+    "archive": "Archive",
+    "restore": "Restore"
+  },
+  "items": {
     "delete": {
       "title": "Delete item",
       "description": "\"{{title}}\" will be permanently removed. This cannot be undone."
@@ -94,7 +79,11 @@
       "descriptionPlaceholder": "Optional details about this item",
       "tags": "Tags",
       "tagsPlaceholder": "design, backlog, idea",
-      "tagsHint": "Separate tags with commas. Up to 8 tags."
+      "tagsHint": "Separate tags with commas. Up to 8 tags.",
+      "favorite": "Mark as favorite",
+      "favoriteHint": "Favorites appear at the top of the sidebar.",
+      "archived": "Archived",
+      "archivedHint": "Archived items are hidden from the main lists."
     }
   },
   "settings": {
@@ -105,7 +94,7 @@
       "description": "Choose how the interface looks on this device.",
       "theme": "Theme",
       "surface": "Surface style",
-      "surfaceHint": "Liquid Glass uses real-time displacement on desktop and falls back to a frosted layer on mobile or with reduced motion.",
+      "surfaceHint": "Liquid Glass warps the backdrop at the panel edges using an SVG displacement filter. Falls back to a frosted layer on mobile or with reduced motion.",
       "compact": "Compact cards",
       "compactDescription": "Show more items per row with tighter spacing."
     },
@@ -154,6 +143,8 @@
     "itemCreated": "Item created.",
     "itemUpdated": "Item updated.",
     "itemDeleted": "Item deleted.",
+    "archived": "Item archived.",
+    "restored": "Item restored.",
     "settingsSaved": "Settings saved.",
     "settingsReset": "Settings restored to defaults."
   }

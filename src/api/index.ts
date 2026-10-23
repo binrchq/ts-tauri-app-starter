@@ -4,6 +4,7 @@ import type {
   AppSettings,
   Item,
   ItemInput,
+  ItemStatus,
   SettingsResponse,
 } from '@/types';
 
@@ -26,6 +27,8 @@ export const api = {
     list: () => invoke<Item[]>('list_items'),
     create: (input: ItemInput) => invoke<Item>('create_item', { input }),
     update: (id: string, input: ItemInput) => invoke<Item>('update_item', { id, input }),
+    patch: (id: string, changes: { favorite?: boolean; status?: ItemStatus }) =>
+      invoke<Item>('patch_item', { id, ...changes }),
     remove: (id: string) => invoke<void>('delete_item', { id }),
   },
 };

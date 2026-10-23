@@ -1,11 +1,18 @@
 export type ThemePreference = 'light' | 'dark' | 'system';
 export type SurfaceStyle = 'solid' | 'glass';
 
+export type ItemStatus = 'active' | 'archived';
+
+/** Sidebar scope / filter for the workspace. */
+export type ItemScope = 'all' | 'favorite' | 'archived' | 'active';
+
 export interface Item {
   id: string;
   title: string;
   description: string;
   tags: string[];
+  favorite: boolean;
+  status: ItemStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -14,6 +21,8 @@ export interface ItemInput {
   title: string;
   description?: string;
   tags?: string[];
+  favorite?: boolean;
+  status?: ItemStatus;
 }
 
 export interface GeneralSettings {
@@ -46,4 +55,4 @@ export interface AppInfo {
   isMobile: boolean;
 }
 
-export type AppView = 'dashboard' | 'items' | 'settings';
+export type AppView = 'workspace' | 'settings';

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '@/api';
-import type { Item, ItemInput } from '@/types';
+import type { Item, ItemInput, ItemStatus } from '@/types';
 
 function sortByUpdatedAt(items: Item[]) {
   return [...items].sort(
@@ -44,10 +44,22 @@ export function useItems() {
     return updated;
   }, []);
 
+  /** Partial update for star / archive toggles from list and inspector. */
+  const patchItem = useCallback(
+    async (id: string, changes: { favorite?: boolean; status?: ItemStatus }) => {
+      const patched = await api.items.patch(id, changes);
+      setItems((current) =>
+        sortByUpdatedAt(current.map((item) => (item.id === id ? patched : item))),
+      );
+      return patched;
+    },
+    [],
+  );
+
   const deleteItem = useCallback(async (id: string) => {
     await api.items.remove(id);
     setItems((current) => current.filter((item) => item.id !== id));
   }, []);
 
-  return { items, loading, error, reload, createItem, updateItem, deleteItem };
+  return { items, loading, error, reload, createItem, updateItem, patchItem, deleteItem };
 }

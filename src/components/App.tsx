@@ -1,49 +1,82 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { TopBar } from '@/components/layout/TopBar';
-import { MobileTopBar } from '@/components/layout/MobileTopBar';
-import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
-import { AmbientBackground } from '@/components/theme/AmbientBackground';
-import { GlassFilters } from '@/components/theme/GlassFilters';
-import { Dashboard } from '@/components/views/Dashboard';
-import { ItemsView } from '@/components/views/ItemsView';
+import { AppSidebar } from '@/components/layout/AppSidebar';
+import { WorkspaceToolbar, type LayoutMode } from '@/components/layout/WorkspaceToolbar';
+import { InspectorPanel } from '@/components/layout/InspectorPanel';
+import { WorkspaceView } from '@/components/views/WorkspaceView';
 import { SettingsView } from '@/components/views/SettingsView';
 import { ItemFormModal } from '@/components/items/ItemFormModal';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { Toast, type ToastMessage, type ToastType } from '@/components/common/Toast';
 import { SurfaceProvider } from '@/components/theme/SurfaceContext';
+import { AmbientBackground } from '@/components/theme/AmbientBackground';
+import { GlassFilters } from '@/components/theme/GlassFilters';
+import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { useItems } from '@/hooks/useItems';
 import { useSettings } from '@/hooks/useSettings';
 import { useTheme } from '@/hooks/useTheme';
-import { useMobile } from '@/hooks/useMobile';
 import { api } from '@/api';
 import i18n, { normalizeLanguage } from '@/i18n';
-import type { AppInfo, AppSettings, AppView, Item, ItemInput, ThemePreference } from '@/types';
+import type {
+  AppInfo,
+  AppSettings,
+  AppView,
+  Item,
+  ItemInput,
+  ItemScope,
+  ThemePreference,
+} from '@/types';
+import { cn } from '@/lib/utils';
 
 const VIEW_STORAGE_KEY = 'tauri-starter.view';
+const LAYOUT_STORAGE_KEY = 'tauri-starter.layout';
 
-function readInitialView(): AppView {
+function readStored<T extends string>(key: string, allowed: readonly T[], fallback: T): T {
   try {
-    const stored = localStorage.getItem(VIEW_STORAGE_KEY);
-    if (stored === 'dashboard' || stored === 'items' || stored === 'settings') {
-      return stored;
-    }
+    const value = localStorage.getItem(key);
+    if (value && (allowed as readonly string[]).includes(value)) return value as T;
   } catch {
-    // Ignore storage errors.
+    /* ignore */
   }
-  return 'dashboard';
+  return fallback;
 }
 
 export default function App() {
   const { t } = useTranslation();
-  const { isMobile } = useMobile();
-  const { settings, loading: settingsLoading, error: settingsError, updateSetting, resetSettings, reload } =
-    useSettings();
-  const { items, loading: itemsLoading, error: itemsError, createItem, updateItem, deleteItem, reload: reloadItems } =
-    useItems();
+  const {
+    settings,
+    loading: settingsLoading,
+    error: settingsError,
+    updateSetting,
+    resetSettings,
+    reload,
+  } = useSettings();
+  const {
+    items,
+    loading: itemsLoading,
+    createItem,
+    updateItem,
+    patchItem,
+    deleteItem,
+  } = useItems();
 
-  const [view, setView] = useState<AppView>(readInitialView);
+  // ---- chrome state --------------------------------------------------------
+  const [view, setView] = useState<AppView>(() =>
+    readStored(VIEW_STORAGE_KEY, ['workspace', 'settings'] as const, 'workspace'),
+  );
+  const [layout, setLayout] = useState<LayoutMode>(() =>
+    readStored(LAYOUT_STORAGE_KEY, ['list', 'grid'] as const, 'list'),
+  );
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [appInfo, setAppInfo] = useState<AppInfo | null>(null);
+
+  // ---- query state ---------------------------------------------------------
+  const [scope, setScope] = useState<ItemScope>('all');
+  const [tag, setTag] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  // ---- dialogs -------------------------------------------------------------
   const [formOpen, setFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [deletingItem, setDeletingItem] = useState<Item | null>(null);
@@ -57,19 +90,17 @@ export default function App() {
     toastId.current += 1;
     setToast({ id: toastId.current, message, type });
   }, []);
-
   const closeToast = useCallback(() => setToast(null), []);
 
-  // Persist the active view so a restart feels continuous.
   useEffect(() => {
     try {
       localStorage.setItem(VIEW_STORAGE_KEY, view);
+      localStorage.setItem(LAYOUT_STORAGE_KEY, layout);
     } catch {
-      // Ignore storage errors.
+      /* ignore */
     }
-  }, [view]);
+  }, [view, layout]);
 
-  // Load backend app info once.
   useEffect(() => {
     let cancelled = false;
     api.app
@@ -77,30 +108,73 @@ export default function App() {
       .then((info) => {
         if (!cancelled) setAppInfo(info);
       })
-      .catch(() => {
-        // Browser mock and non-Tauri environments still render.
-      });
+      .catch(() => undefined);
     return () => {
       cancelled = true;
     };
   }, []);
 
-  // Apply the persisted language once settings are available.
   useEffect(() => {
     if (!settings) return;
     const language = normalizeLanguage(settings.general.language);
-    if (i18n.resolvedLanguage !== language) {
-      void i18n.changeLanguage(language);
-    }
+    if (i18n.resolvedLanguage !== language) void i18n.changeLanguage(language);
   }, [settings]);
 
-  const navigate = useCallback((next: AppView) => {
-    setView(next);
+  // ---- derived data --------------------------------------------------------
+  const filtered = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+
+    return items.filter((item) => {
+      if (scope === 'favorite' && !item.favorite) return false;
+      if (scope === 'active' && item.status !== 'active') return false;
+      if (scope === 'archived' && item.status !== 'archived') return false;
+      if (scope !== 'archived' && item.status === 'archived') return false;
+      if (tag && !item.tags.includes(tag)) return false;
+      if (!needle) return true;
+      return (
+        item.title.toLowerCase().includes(needle) ||
+        item.description.toLowerCase().includes(needle) ||
+        item.tags.some((name) => name.toLowerCase().includes(needle))
+      );
+    });
+  }, [items, scope, tag, query]);
+
+  const selected = useMemo(
+    () => items.find((item) => item.id === selectedId) ?? null,
+    [items, selectedId],
+  );
+
+  // Drop the selection when it falls out of the current filter.
+  useEffect(() => {
+    if (selectedId && !filtered.some((item) => item.id === selectedId)) {
+      setSelectedId(null);
+    }
+  }, [filtered, selectedId]);
+
+  const scopeLabel = scope === 'all'
+    ? t('sidebar.all')
+    : scope === 'favorite'
+      ? t('sidebar.favorites')
+      : scope === 'active'
+        ? t('sidebar.active')
+        : t('sidebar.archived');
+
+  const title = tag ? `#${tag}` : scopeLabel;
+  const subtitle = t('workspace.count', { count: filtered.length });
+
+  const isFiltered = Boolean(query || tag || scope !== 'all');
+
+  const clearFilters = useCallback(() => {
+    setQuery('');
+    setTag(null);
+    setScope('all');
   }, []);
 
+  // ---- actions -------------------------------------------------------------
   const openCreate = useCallback(() => {
     setEditingItem(null);
     setFormOpen(true);
+    setSidebarOpen(false);
   }, []);
 
   const openEdit = useCallback((item: Item) => {
@@ -115,17 +189,15 @@ export default function App() {
 
   const handleSave = useCallback(
     async (input: ItemInput) => {
-      try {
-        if (editingItem) {
-          await updateItem(editingItem.id, input);
-          notify(t('toast.itemUpdated'));
-        } else {
-          await createItem(input);
-          notify(t('toast.itemCreated'));
-        }
-      } catch (cause) {
-        notify(cause instanceof Error ? cause.message : String(cause), 'error');
-        throw cause;
+      if (editingItem) {
+        const next = await updateItem(editingItem.id, input);
+        notify(t('toast.itemUpdated'));
+        setSelectedId(next.id);
+      } else {
+        const created = await createItem(input);
+        notify(t('toast.itemCreated'));
+        setSelectedId(created.id);
+        setView('workspace');
       }
     },
     [createItem, editingItem, notify, t, updateItem],
@@ -136,6 +208,7 @@ export default function App() {
     setDeleting(true);
     try {
       await deleteItem(deletingItem.id);
+      if (selectedId === deletingItem.id) setSelectedId(null);
       setDeletingItem(null);
       notify(t('toast.itemDeleted'));
     } catch (cause) {
@@ -143,14 +216,38 @@ export default function App() {
     } finally {
       setDeleting(false);
     }
-  }, [deleteItem, deletingItem, notify, t]);
+  }, [deleteItem, deletingItem, notify, selectedId, t]);
+
+  const handleToggleFavorite = useCallback(
+    async (item: Item) => {
+      try {
+        await patchItem(item.id, { favorite: !item.favorite });
+      } catch (cause) {
+        notify(cause instanceof Error ? cause.message : String(cause), 'error');
+      }
+    },
+    [notify, patchItem],
+  );
+
+  const handleToggleArchive = useCallback(
+    async (item: Item) => {
+      const nextStatus = item.status === 'archived' ? 'active' : 'archived';
+      try {
+        await patchItem(item.id, { status: nextStatus });
+        notify(nextStatus === 'archived' ? t('toast.archived') : t('toast.restored'));
+      } catch (cause) {
+        notify(cause instanceof Error ? cause.message : String(cause), 'error');
+      }
+    },
+    [notify, patchItem, t],
+  );
 
   const changeTheme = useCallback(
     (theme: ThemePreference) => {
       if (!settings) return;
-      void updateSetting('ui', { ...settings.ui, theme }).catch((cause) => {
-        notify(cause instanceof Error ? cause.message : String(cause), 'error');
-      });
+      void updateSetting('ui', { ...settings.ui, theme }).catch((cause) =>
+        notify(cause instanceof Error ? cause.message : String(cause), 'error'),
+      );
     },
     [notify, settings, updateSetting],
   );
@@ -170,6 +267,7 @@ export default function App() {
     return next;
   }, [notify, resetSettings, t]);
 
+  // ---- render --------------------------------------------------------------
   if (settingsLoading && !settings) {
     return <SplashScreen label={t('app.loading')} />;
   }
@@ -189,74 +287,142 @@ export default function App() {
 
   const surface = settings.ui.surface;
 
+  const sidebar = (
+    <AppSidebar
+      items={items}
+      scope={scope}
+      onScope={setScope}
+      tag={tag}
+      onTag={setTag}
+      view={view}
+      onView={setView}
+      onCompose={openCreate}
+      appInfo={appInfo}
+    />
+  );
+
   return (
     <SurfaceProvider surface={surface}>
-      <div data-surface={surface} className="relative flex h-dvh flex-col overflow-hidden">
+      <div data-surface={surface} className="relative flex h-dvh overflow-hidden">
         <GlassFilters />
         <AmbientBackground />
 
-        {isMobile ? (
-          <MobileTopBar theme={settings.ui.theme} onThemeChange={changeTheme} />
-        ) : (
-          <TopBar
-            view={view}
-            onNavigate={navigate}
-            theme={settings.ui.theme}
-            onThemeChange={changeTheme}
+        {/* Sidebar — static on desktop */}
+        <div className="hidden lg:flex">{sidebar}</div>
+
+        {/* Sidebar — drawer on mobile */}
+        <div
+          className={cn(
+            'fixed inset-0 z-[90] lg:hidden',
+            sidebarOpen ? 'pointer-events-auto' : 'pointer-events-none',
+          )}
+          aria-hidden={!sidebarOpen}
+        >
+          <div
+            onClick={() => setSidebarOpen(false)}
+            className={cn(
+              'absolute inset-0 bg-slate-950/45 backdrop-blur-sm transition-opacity',
+              sidebarOpen ? 'opacity-100' : 'opacity-0',
+            )}
           />
+          <div
+            className={cn(
+              'absolute inset-y-0 left-0 shadow-2xl transition-transform duration-300 ease-out',
+              sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+            )}
+          >
+            {sidebar}
+          </div>
+        </div>
+
+        {/* Main pane */}
+        <div className="flex min-w-0 flex-1 flex-col">
+          {view === 'workspace' ? (
+            <>
+              <WorkspaceToolbar
+                title={title}
+                subtitle={subtitle}
+                query={query}
+                onQuery={setQuery}
+                layout={layout}
+                onLayout={setLayout}
+                onCompose={openCreate}
+                onOpenSidebar={() => setSidebarOpen(true)}
+              />
+
+              <main className="min-h-0 flex-1 overflow-y-auto">
+                <WorkspaceView
+                  items={filtered}
+                  loading={itemsLoading}
+                  layout={layout}
+                  selectedId={selectedId}
+                  filtered={isFiltered}
+                  onSelect={setSelectedId}
+                  onToggleFavorite={handleToggleFavorite}
+                  onCompose={openCreate}
+                  onClearFilters={clearFilters}
+                />
+              </main>
+            </>
+          ) : (
+            <SettingsView
+              settings={settings}
+              appInfo={appInfo}
+              onUpdate={changeSettings}
+              onReset={handleResetSettings}
+              onClose={() => setView('workspace')}
+              themeToggle={<ThemeToggle theme={settings.ui.theme} onChange={changeTheme} bare />}
+            />
+          )}
+        </div>
+
+        {/* Inspector — desktop column */}
+        {view === 'workspace' && selected && (
+          <div className="hidden lg:flex">
+            <InspectorPanel
+              item={selected}
+              onClose={() => setSelectedId(null)}
+              onEdit={openEdit}
+              onDelete={setDeletingItem}
+              onToggleFavorite={handleToggleFavorite}
+              onToggleArchive={handleToggleArchive}
+            />
+          </div>
         )}
 
-        <main className="min-h-0 flex-1 overflow-hidden">
-            {view === 'dashboard' && (
-              <Dashboard
-                items={items}
-                settings={settings}
-                appInfo={appInfo}
-                onNavigate={navigate}
-                onCreate={openCreate}
-                onEdit={openEdit}
-              />
-            )}
-
-            {view === 'items' && (
-              <ItemsView
-                items={items}
-                loading={itemsLoading}
-                error={itemsError}
-                pageSize={settings.ui.pageSize}
-                compact={settings.ui.compact}
-                onCreate={openCreate}
+        {/* Inspector — mobile sheet */}
+        {view === 'workspace' && selected && (
+          <div className="fixed inset-0 z-[95] lg:hidden">
+            <div
+              className="absolute inset-0 bg-slate-950/45 backdrop-blur-sm"
+              onClick={() => setSelectedId(null)}
+            />
+            <div className="absolute inset-y-0 right-0 w-full max-w-md animate-slide-up shadow-2xl">
+              <InspectorPanel
+                item={selected}
+                onClose={() => setSelectedId(null)}
                 onEdit={openEdit}
                 onDelete={setDeletingItem}
-                onReload={() => void reloadItems()}
+                onToggleFavorite={handleToggleFavorite}
+                onToggleArchive={handleToggleArchive}
               />
-            )}
+            </div>
+          </div>
+        )}
 
-            {view === 'settings' && (
-              <SettingsView
-                settings={settings}
-                appInfo={appInfo}
-                onUpdate={changeSettings}
-                onReset={handleResetSettings}
-              />
-            )}
-          </main>
+        <ItemFormModal open={formOpen} item={editingItem} onClose={closeForm} onSave={handleSave} />
 
-          {isMobile && <MobileBottomNav view={view} onNavigate={navigate} />}
+        <ConfirmDialog
+          open={Boolean(deletingItem)}
+          title={t('items.delete.title')}
+          description={t('items.delete.description', { title: deletingItem?.title ?? '' })}
+          confirmLabel={t('common.delete')}
+          busy={deleting}
+          onConfirm={handleDelete}
+          onClose={() => setDeletingItem(null)}
+        />
 
-          <ItemFormModal open={formOpen} item={editingItem} onClose={closeForm} onSave={handleSave} />
-
-          <ConfirmDialog
-            open={Boolean(deletingItem)}
-            title={t('items.delete.title')}
-            description={t('items.delete.description', { title: deletingItem?.title ?? '' })}
-            confirmLabel={t('common.delete')}
-            busy={deleting}
-            onConfirm={handleDelete}
-            onClose={() => setDeletingItem(null)}
-          />
-
-          <Toast toast={toast} onClose={closeToast} />
+        <Toast toast={toast} onClose={closeToast} />
       </div>
     </SurfaceProvider>
   );
@@ -264,7 +430,7 @@ export default function App() {
 
 interface SplashScreenProps {
   label: string;
-  action?: ReactNode;
+  action?: React.ReactNode;
 }
 
 function SplashScreen({ label, action }: SplashScreenProps) {

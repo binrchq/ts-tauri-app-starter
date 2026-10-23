@@ -96,6 +96,18 @@ pub async fn update_item(
     item_service::update(id, input, app, state).await
 }
 
+/// Partial update for quick toggles (star / archive) from list and inspector.
+#[tauri::command]
+pub async fn patch_item(
+    id: String,
+    favorite: Option<bool>,
+    status: Option<String>,
+    app: tauri::AppHandle,
+    state: State<'_, AppState>,
+) -> Result<Item, String> {
+    item_service::patch(id, favorite, status, app, state).await
+}
+
 #[tauri::command]
 pub async fn delete_item(
     id: String,

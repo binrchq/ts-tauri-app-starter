@@ -25,6 +25,8 @@ const seedItems = (): Item[] => {
       description:
         'This starter ships with a typed React shell, a layered Rust backend and a ready-to-use CRUD example.',
       tags: ['starter', 'welcome'],
+      favorite: true,
+      status: 'active' as const,
       createdAt: iso(120),
       updatedAt: iso(5),
     },
@@ -34,6 +36,8 @@ const seedItems = (): Item[] => {
       description:
         'Change the product name, colors, identifier and icons. Every placeholder is documented in the README.',
       tags: ['theme', 'branding'],
+      favorite: false,
+      status: 'active' as const,
       createdAt: iso(240),
       updatedAt: iso(30),
     },
@@ -43,6 +47,8 @@ const seedItems = (): Item[] => {
       description:
         'Follow the commands → service → dao → model flow to add a new capability without breaking the architecture.',
       tags: ['architecture', 'rust'],
+      favorite: false,
+      status: 'active' as const,
       createdAt: iso(360),
       updatedAt: iso(60),
     },
@@ -167,6 +173,8 @@ async function mockInvoke(command: string, args: Record<string, unknown>): Promi
         title: (input.title ?? '').trim(),
         description: (input.description ?? '').trim(),
         tags: normalizeTags(input.tags),
+        favorite: input.favorite ?? false,
+        status: input.status === 'archived' ? 'archived' : 'active',
         createdAt: now,
         updatedAt: now,
       };
@@ -187,11 +195,30 @@ async function mockInvoke(command: string, args: Record<string, unknown>): Promi
         title: (input.title ?? current.title).trim(),
         description: (input.description ?? '').trim(),
         tags: normalizeTags(input.tags ?? current.tags),
+        favorite: input.favorite ?? current.favorite,
+        status: input.status ?? current.status,
         updatedAt: new Date().toISOString(),
       };
       db.items = db.items.map((item) => (item.id === id ? updated : item));
       writeMockDb(db);
       return updated;
+    }
+
+    case 'patch_item': {
+      const id = String(args.id);
+      const index = db.items.findIndex((item) => item.id === id);
+      if (index === -1) throw new Error('Item not found');
+
+      const current = db.items[index];
+      const patched: Item = {
+        ...current,
+        favorite: typeof args.favorite === 'boolean' ? args.favorite : current.favorite,
+        status: args.status === 'archived' ? 'archived' : args.status === 'active' ? 'active' : current.status,
+        updatedAt: new Date().toISOString(),
+      };
+      db.items = db.items.map((item) => (item.id === id ? patched : item));
+      writeMockDb(db);
+      return patched;
     }
 
     case 'delete_item': {

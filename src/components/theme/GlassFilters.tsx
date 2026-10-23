@@ -21,7 +21,7 @@
  * here is the *backdrop* behind the element, not the element itself.
  */
 
-const EDGE = 0.2; // width of the refracting band, as a fraction of the side
+const EDGE = 0.085; // thin rim: visible lensing without warping small panels
 
 const mapX = `<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' preserveAspectRatio='none'><defs><linearGradient id='a' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='rgb(0,128,128)'/><stop offset='${EDGE}' stop-color='rgb(128,128,128)'/><stop offset='${1 - EDGE}' stop-color='rgb(128,128,128)'/><stop offset='1' stop-color='rgb(255,128,128)'/></linearGradient></defs><rect width='100' height='100' fill='url(%23a)'/></svg>`;
 
@@ -79,9 +79,9 @@ export function GlassFilters() {
     >
       <defs>
         {/* Large surfaces: gentle bend, stays readable. */}
-        <Lens id="lg-panel" scale={54} blur={1.1} />
+        <Lens id="lg-panel" scale={20} blur={1} />
         {/* Floating chrome: stronger lensing, it is small and sits over motion. */}
-        <Lens id="lg-chrome" scale={64} blur={0.5} />
+        <Lens id="lg-chrome" scale={22} blur={0.5} />
       </defs>
     </svg>
   );
