@@ -93,7 +93,7 @@ export function SettingsView({
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <header className="flex h-16 shrink-0 items-center gap-3 border-b border-slate-200/70 bg-white/60 px-4 backdrop-blur-xl dark:border-white/8 dark:bg-slate-950/50 lg:px-6">
+      <header className="flex h-[60px] shrink-0 items-center gap-3 border-b border-slate-900/8 px-4 dark:border-white/8 lg:px-5">
         <button
           type="button"
           onClick={onClose}
@@ -298,7 +298,7 @@ interface SettingsSectionProps {
 
 function SettingsSection({ icon: Icon, title, description, children }: SettingsSectionProps) {
   return (
-    <section className="panel p-6 sm:p-7">
+    <section className="panel p-5 sm:p-6">
       <div className="mb-5 flex items-start gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-300">
           <Icon className="h-5 w-5" />

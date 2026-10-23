@@ -68,10 +68,10 @@ export function AppSidebar({
   return (
     <aside
       className={cn(
-        'flex h-full w-72 shrink-0 flex-col border-r',
+        'flex h-full w-[264px] shrink-0 flex-col overflow-hidden rounded-[20px]',
         isGlass
-          ? 'border-white/50 bg-white/55 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/40'
-          : 'border-slate-200/70 bg-white/80 dark:border-white/8 dark:bg-slate-900/60',
+          ? 'glass-surface'
+          : 'border border-slate-200/70 bg-white/85 shadow-sm backdrop-blur-xl dark:border-white/8 dark:bg-slate-900/70',
       )}
     >
       {/* Brand */}
@@ -171,7 +171,7 @@ export function AppSidebar({
       )}
 
       {/* Footer */}
-      <div className="mt-auto border-t border-slate-200/70 p-2 dark:border-white/8">
+      <div className="mt-auto border-t border-slate-900/8 p-2 dark:border-white/8">
         <button
           type="button"
           onClick={() => onView('settings')}

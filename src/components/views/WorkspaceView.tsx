@@ -41,7 +41,7 @@ export function WorkspaceView({
 
   if (loading) {
     return (
-      <div className="space-y-2 p-4 lg:p-6">
+      <div className="space-y-2 p-4 lg:p-5">
         {Array.from({ length: 7 }).map((_, index) => (
           <div
             key={index}
@@ -54,7 +54,7 @@ export function WorkspaceView({
 
   if (items.length === 0) {
     return (
-      <div className="p-4 lg:p-6">
+      <div className="p-4 lg:p-5">
         <EmptyState
           icon={filtered ? MagnifyingGlassIcon : InboxIcon}
           title={filtered ? t('workspace.noResults.title') : t('workspace.empty.title')}
@@ -78,7 +78,7 @@ export function WorkspaceView({
 
   if (layout === 'grid') {
     return (
-      <div className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3 lg:p-6">
+      <div className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3 lg:p-5">
         {items.map((item) => {
           const selected = item.id === selectedId;
           return (
@@ -138,7 +138,7 @@ export function WorkspaceView({
 
   // Dense list
   return (
-    <ul className="divide-y divide-slate-200/60 dark:divide-white/6">
+    <ul className="divide-y divide-slate-900/6 dark:divide-white/6">
       {items.map((item) => {
         const selected = item.id === selectedId;
         const archived = item.status === 'archived';
@@ -155,7 +155,7 @@ export function WorkspaceView({
                 }
               }}
               className={cn(
-                'group flex cursor-pointer items-start gap-3 px-4 py-3 transition-colors lg:px-6',
+                'group flex cursor-pointer items-start gap-3 px-4 py-3 transition-colors lg:px-5',
                 selected ? 'bg-brand-500/10' : 'hover:bg-slate-900/4 dark:hover:bg-white/5',
                 selected && 'shadow-[inset_2px_0_0_rgb(99_102_241)]',
               )}

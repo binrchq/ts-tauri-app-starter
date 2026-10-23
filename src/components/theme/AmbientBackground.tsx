@@ -1,20 +1,19 @@
 /**
  * Ambient background.
  *
- * Deliberately restrained — no coloured blobs. Loud colour behind the panels
- * made the glass look like stained plastic, and it fought the UI for attention.
+ * The colour itself lives on <body> as very large, very low-opacity washes —
+ * anchored off-canvas so only their falloff is visible. That reads as tinted
+ * light rather than as blobs, and crucially it gives the glass something to
+ * refract; over a flat grey page any glass treatment is invisible.
  *
- * What remains:
- *   grid      the one high-frequency element; glass edge-refraction is only
- *             visible because there are straight lines to bend
- *   glow      a single soft light source, top-centre, very low opacity
- *   vignette  settles the edges and gives the surface depth
- *   grain     fine noise that kills banding on wide gradients
+ * This layer adds what the washes cannot:
+ *   grid      high-frequency straight lines — the thing edge-refraction bends
+ *   vignette  settles the corners, adds depth
+ *   grain     kills banding on wide gradients, adds physical texture
  */
 export function AmbientBackground() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-      <div className="bg-glow" />
       <div className="bg-grid" />
       <div className="bg-vignette" />
       <div className="bg-grain" />

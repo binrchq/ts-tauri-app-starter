@@ -31,15 +31,26 @@
 
   body {
     @apply font-sans text-slate-900 antialiased dark:text-slate-100;
-    /* A near-white page makes white glass invisible (measured delta was 0-3/255).
-       A slightly deeper, grayer page gives the panes something to sit against. */
-    background-color: #e9edf4;
-    background-image: linear-gradient(180deg, #eef1f7 0%, #e6eaf2 55%, #dfe4ee 100%);
+    /* Ambient colour, not colour blobs.
+       Each wash is anchored outside the canvas and is 100rem+ across, so only
+       its falloff is ever on screen — you read it as tinted light, never as a
+       circle. This is what the glass has to refract; a flat grey page makes
+       any glass treatment invisible. */
+    background-color: #eceff6;
+    background-image:
+      radial-gradient(120rem 80rem at 12% -25%, rgb(99 102 241 / 0.13), transparent 62%),
+      radial-gradient(110rem 75rem at 98% 8%, rgb(14 165 233 / 0.11), transparent 62%),
+      radial-gradient(95rem 70rem at 62% 118%, rgb(192 132 252 / 0.1), transparent 62%),
+      linear-gradient(180deg, #f5f7fc 0%, #e9edf5 100%);
   }
 
   .dark body {
-    background-color: #06090f;
-    background-image: linear-gradient(180deg, #0a0e17 0%, #06090f 55%, #04060a 100%);
+    background-color: #070a12;
+    background-image:
+      radial-gradient(120rem 80rem at 12% -25%, rgb(99 102 241 / 0.26), transparent 62%),
+      radial-gradient(110rem 75rem at 98% 8%, rgb(14 165 233 / 0.18), transparent 62%),
+      radial-gradient(95rem 70rem at 62% 118%, rgb(192 132 252 / 0.16), transparent 62%),
+      linear-gradient(180deg, #0b1019 0%, #05070d 100%);
   }
 
   h1,
@@ -81,23 +92,36 @@
   textarea::placeholder {
     @apply text-slate-400 dark:text-slate-500;
   }
+
+  /* Borderless window: the title bar is ours. Dragging must not select text
+     or start a native image/text drag inside the WebView. */
+  [data-tauri-drag-region] {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-app-region: drag;
+    cursor: default;
+  }
+
+  [data-tauri-drag-region] button,
+  [data-tauri-drag-region] a,
+  [data-tauri-drag-region] input {
+    -webkit-app-region: no-drag;
+  }
 }
 
 /* ============================================================
    Ambient background — this is what the glass refracts.
    ============================================================ */
 @layer components {
-  /* Ambient layer.
-     Deliberately restrained: no coloured blobs. The glass gets its legibility
-     from definition (hairline + bevel + shadow), not from a loud backdrop.
-     The grid is the one high-frequency element — it is what makes the edge
-     refraction readable. */
+  /* The colour lives on <body> as large-scale washes. This layer only adds
+     the high-frequency detail (grid) and texture (grain) that make edge
+     refraction legible, plus a vignette for depth. */
   .bg-grid {
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(to right, rgb(15 23 42 / 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(15 23 42 / 0.05) 1px, transparent 1px);
+      linear-gradient(to right, rgb(15 23 42 / 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(15 23 42 / 0.045) 1px, transparent 1px);
     background-size: 40px 40px;
     mask-image: radial-gradient(ellipse 130% 95% at 50% 0%, #000 42%, transparent 95%);
   }
@@ -106,21 +130,6 @@
     background-image:
       linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
       linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
-  }
-
-  /* A single soft light source, top-centre. Low opacity on purpose. */
-  .bg-glow {
-    position: absolute;
-    left: 50%;
-    top: -38%;
-    height: 78vh;
-    width: 128vw;
-    transform: translateX(-50%);
-    background: radial-gradient(ellipse at 50% 50%, rgb(99 102 241 / 0.14), transparent 62%);
-  }
-
-  .dark .bg-glow {
-    background: radial-gradient(ellipse at 50% 50%, rgb(99 102 241 / 0.2), transparent 62%);
   }
 
   /* Vignette settles the edges and adds depth. */
@@ -310,9 +319,9 @@
   /* Frost level. On a neutral backdrop this is what separates a panel from
      the page; definition comes from the hairline + bevel below, not from a
      loud background. */
-  /* A glass pane must stay mostly transmissive. 0.52 read as a solid white
-     slab; definition comes from the hairline, bevel and shadow instead. */
-  --glass-tint: 0.42;
+  /* Panels now float over an ambient, tinted page, so they can be far more
+     transmissive than when they tiled the whole viewport. */
+  --glass-tint: 0.3;
   --glass-hairline: rgb(15 23 42 / 0.07);
   --glass-shadow:
     0 1px 2px rgb(15 23 42 / 0.04),
@@ -320,7 +329,7 @@
 }
 
 .dark {
-  --glass-tint: 0.07;
+  --glass-tint: 0.055;
   --glass-hairline: rgb(255 255 255 / 0.09);
   --glass-shadow:
     0 1px 2px rgb(0 0 0 / 0.5),

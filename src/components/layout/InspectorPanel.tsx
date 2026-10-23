@@ -48,13 +48,13 @@ export function InspectorPanel({
   return (
     <aside
       className={cn(
-        'flex h-full w-full flex-col border-l lg:w-[352px] lg:shrink-0',
+        'flex h-full w-full flex-col overflow-hidden rounded-[20px] lg:w-[340px] lg:shrink-0',
         isGlass
-          ? 'border-white/50 bg-white/55 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/40'
-          : 'border-slate-200/70 bg-white/80 dark:border-white/8 dark:bg-slate-900/60',
+          ? 'glass-surface'
+          : 'border border-slate-200/70 bg-white/85 shadow-sm backdrop-blur-xl dark:border-white/8 dark:bg-slate-900/70',
       )}
     >
-      <header className="flex shrink-0 items-start gap-2 border-b border-slate-200/70 p-4 dark:border-white/8">
+      <header className="flex shrink-0 items-start gap-2 border-b border-slate-900/8 p-4 dark:border-white/8">
         <div className="min-w-0 flex-1">
           <h2 className="text-sm font-bold leading-snug tracking-tight break-words">
             {item.title}
@@ -136,7 +136,7 @@ export function InspectorPanel({
       </div>
 
       {/* Actions */}
-      <footer className="shrink-0 space-y-2 border-t border-slate-200/70 p-4 dark:border-white/8">
+      <footer className="shrink-0 space-y-2 border-t border-slate-900/8 p-4 dark:border-white/8">
         <button type="button" onClick={() => onEdit(item)} className="btn-secondary h-10 w-full">
           <PencilSquareIcon className="h-4 w-4" />
           {t('common.edit')}

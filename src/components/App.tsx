@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppSidebar } from '@/components/layout/AppSidebar';
+import { TitleBar } from '@/components/layout/TitleBar';
 import { WorkspaceToolbar, type LayoutMode } from '@/components/layout/WorkspaceToolbar';
 import { InspectorPanel } from '@/components/layout/InspectorPanel';
 import { WorkspaceView } from '@/components/views/WorkspaceView';
@@ -303,12 +304,15 @@ export default function App() {
 
   return (
     <SurfaceProvider surface={surface}>
-      <div data-surface={surface} className="relative flex h-dvh overflow-hidden">
+      <div data-surface={surface} className="relative flex h-dvh flex-col overflow-hidden">
         <GlassFilters />
         <AmbientBackground />
 
-        {/* Sidebar — static on desktop */}
-        <div className="hidden lg:flex">{sidebar}</div>
+        <TitleBar title={t('app.name')} />
+
+        <div className="flex min-h-0 flex-1 gap-3 overflow-hidden p-3 pt-0">
+          {/* Sidebar — static on desktop */}
+          <div className="hidden lg:flex">{sidebar}</div>
 
         {/* Sidebar — drawer on mobile */}
         <div
@@ -327,8 +331,8 @@ export default function App() {
           />
           <div
             className={cn(
-              'absolute inset-y-0 left-0 shadow-2xl transition-transform duration-300 ease-out',
-              sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+              'absolute inset-y-3 left-3 shadow-2xl transition-transform duration-300 ease-out',
+              sidebarOpen ? 'translate-x-0' : '-translate-x-[110%]',
             )}
           >
             {sidebar}
@@ -336,7 +340,14 @@ export default function App() {
         </div>
 
         {/* Main pane */}
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div
+          className={cn(
+            'flex min-w-0 flex-1 flex-col overflow-hidden rounded-[20px]',
+            surface === 'glass'
+              ? 'glass-surface'
+              : 'border border-slate-200/70 bg-white/85 shadow-sm backdrop-blur-xl dark:border-white/8 dark:bg-slate-900/70',
+          )}
+        >
           {view === 'workspace' ? (
             <>
               <WorkspaceToolbar
@@ -389,6 +400,7 @@ export default function App() {
             />
           </div>
         )}
+        </div>
 
         {/* Inspector — mobile sheet */}
         {view === 'workspace' && selected && (
@@ -397,7 +409,7 @@ export default function App() {
               className="absolute inset-0 bg-slate-950/45 backdrop-blur-sm"
               onClick={() => setSelectedId(null)}
             />
-            <div className="absolute inset-y-0 right-0 w-full max-w-md animate-slide-up shadow-2xl">
+            <div className="absolute inset-y-3 right-3 w-[calc(100%-1.5rem)] max-w-md animate-slide-up shadow-2xl">
               <InspectorPanel
                 item={selected}
                 onClose={() => setSelectedId(null)}

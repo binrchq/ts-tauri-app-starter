@@ -39,8 +39,8 @@ export function WorkspaceToolbar({
     'inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-900/6 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-white';
 
   return (
-    <header className="shrink-0 border-b border-slate-200/70 bg-white/60 backdrop-blur-xl dark:border-white/8 dark:bg-slate-950/50">
-      <div className="flex h-16 items-center gap-3 px-4 lg:px-6">
+    <header className="shrink-0 border-b border-slate-900/8 dark:border-white/8">
+      <div className="flex h-[60px] items-center gap-3 px-4 lg:px-5">
         <button type="button" onClick={onOpenSidebar} className={cn(iconBtn, 'lg:hidden')} aria-label="Menu">
           <Bars3Icon className="h-5 w-5" />
         </button>
@@ -57,7 +57,7 @@ export function WorkspaceToolbar({
             onChange={(event) => onQuery(event.target.value)}
             placeholder={t('workspace.searchPlaceholder')}
             aria-label={t('workspace.searchPlaceholder')}
-            className="h-9 w-56 rounded-xl border border-slate-200 bg-white/70 pl-9 pr-8 text-sm transition-all placeholder:text-slate-400 focus:w-72 focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10 dark:border-white/10 dark:bg-white/6"
+            className="h-9 w-56 rounded-xl border border-slate-900/10 bg-white/55 pl-9 pr-8 text-sm transition-all placeholder:text-slate-400 focus:w-72 focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10 dark:border-white/10 dark:bg-white/6"
           />
           {query && (
             <button
@@ -71,7 +71,7 @@ export function WorkspaceToolbar({
           )}
         </div>
 
-        <div className="hidden items-center rounded-xl border border-slate-200 bg-white/70 p-0.5 sm:flex dark:border-white/10 dark:bg-white/6">
+        <div className="hidden items-center rounded-xl border border-slate-900/10 bg-white/55 p-0.5 sm:flex dark:border-white/10 dark:bg-white/6">
           {([
             ['list', ListBulletIcon],
             ['grid', Squares2X2Icon],
