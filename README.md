@@ -161,6 +161,35 @@ The library is `React.lazy`-loaded, so its ~53 kB chunk is only fetched when gla
 
 ---
 
+## Showcase: GitHub-style UI demo
+
+`demo/` contains a standalone entry that renders a GitHub-style repository page with the
+same glass system — useful for judging the effect against dense, realistic UI rather than
+an empty page.
+
+```bash
+npm run dev          # then open http://localhost:1420/demo/
+```
+
+It ships its own Vite entry (`demo/index.html`), so **the starter itself stays clean** —
+nothing in `src/` knows the demo exists.
+
+The demo includes a `glass` / `solid` switch and a light/dark toggle in its top bar, so you
+can A/B the surface treatment live.
+
+Why GitHub as the test case: the effect is only convincing over **high-frequency content**.
+The demo deliberately packs in a file list, a contribution heatmap (182 cells), a language
+bar, a diff block and code samples — all of which give the lens something to bend.
+
+| File | Purpose |
+| --- | --- |
+| `demo/index.html` | Vite entry |
+| `demo/main.tsx` | Mounts the demo |
+| `demo/GitHubDemo.tsx` | The UI (fictional `octo-labs/aurora-ui` repo) |
+| `demo/github.css` | GitHub-flavoured layout primitives (heatmap, language bar, diff) |
+
+---
+
 ## Adding your own domain feature
 
 Replace `Item` end-to-end in six steps:

@@ -13,6 +13,9 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
+        // Standalone showcase: a GitHub-style UI rendered with the same glass
+        // system. Kept as its own entry so the starter itself stays clean.
+        demo: resolve(__dirname, 'demo/index.html'),
       },
     },
   },

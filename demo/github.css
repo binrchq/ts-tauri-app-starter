@@ -1,0 +1,190 @@
+/* ============================================================
+   GitHub-style demo — layout primitives only.
+
+   The glass itself comes from the starter (`src/input.css`); everything here
+   is GitHub-flavoured chrome: contribution heatmap, language bar, diff rows.
+   ============================================================ */
+
+/* GitHub-ish palette, used for content accents inside translucent panels. */
+:root {
+  --gh-fg: #1f2328;
+  --gh-muted: #59636e;
+  --gh-line: rgb(31 35 40 / 0.15);
+  --gh-accent: #0969da;
+  --gh-green: #1a7f37;
+  --gh-open: #1a7f37;
+  --gh-closed: #cf222e;
+  --gh-merged: #8250df;
+}
+
+.dark {
+  --gh-fg: #e6edf3;
+  --gh-muted: #9198a1;
+  --gh-line: rgb(240 246 252 / 0.1);
+  --gh-accent: #4493f8;
+  --gh-green: #3fb950;
+  --gh-open: #3fb950;
+  --gh-closed: #f85149;
+  --gh-merged: #a371f7;
+}
+
+.gh-page {
+  color: var(--gh-fg);
+}
+
+.gh-muted {
+  color: var(--gh-muted);
+}
+
+.gh-link {
+  color: var(--gh-accent);
+}
+
+.gh-divider {
+  border-color: var(--gh-line);
+}
+
+/* Thin GitHub-flavoured separator that works over glass. */
+.gh-sep {
+  height: 1px;
+  background: var(--gh-line);
+}
+
+/* ---- Contribution heatmap -------------------------------------------
+   Dense, high-frequency detail: exactly what makes edge refraction visible. */
+.gh-heat {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, 11px);
+  gap: 3px;
+}
+
+.gh-heat span {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  background: rgb(31 35 40 / 0.08);
+}
+
+.dark .gh-heat span {
+  background: rgb(240 246 252 / 0.06);
+}
+
+.gh-heat .l1 { background: #9be9a8; }
+.gh-heat .l2 { background: #40c463; }
+.gh-heat .l3 { background: #30a14e; }
+.gh-heat .l4 { background: #216e39; }
+
+.dark .gh-heat .l1 { background: #0e4429; }
+.dark .gh-heat .l2 { background: #006d32; }
+.dark .gh-heat .l3 { background: #26a641; }
+.dark .gh-heat .l4 { background: #39d353; }
+
+/* ---- Language bar ---- */
+.gh-lang-bar {
+  display: flex;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 9999px;
+}
+
+.gh-lang-bar > i {
+  display: block;
+  height: 100%;
+}
+
+/* ---- File rows ---- */
+.gh-file-row {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) minmax(0, 1.4fr) 96px;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (max-width: 860px) {
+  .gh-file-row {
+    grid-template-columns: 20px minmax(0, 1fr) 96px;
+  }
+  .gh-file-row .gh-file-msg {
+    display: none;
+  }
+}
+
+/* ---- Diff preview ---- */
+.gh-diff {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.gh-diff-add {
+  background: rgb(46 160 67 / 0.16);
+  box-shadow: inset 3px 0 0 rgb(46 160 67 / 0.65);
+}
+
+.gh-diff-del {
+  background: rgb(248 81 73 / 0.14);
+  box-shadow: inset 3px 0 0 rgb(248 81 73 / 0.6);
+}
+
+.dark .gh-diff-add {
+  background: rgb(63 185 80 / 0.16);
+  box-shadow: inset 3px 0 0 rgb(63 185 80 / 0.7);
+}
+
+/* ---- Misc GitHub bits ---- */
+.gh-counter {
+  display: inline-flex;
+  align-items: center;
+  min-width: 20px;
+  justify-content: center;
+  border-radius: 9999px;
+  background: rgb(31 35 40 / 0.08);
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.dark .gh-counter {
+  background: rgb(240 246 252 / 0.12);
+}
+
+.gh-tab-active {
+  box-shadow: inset 0 -2px 0 var(--gh-accent);
+  color: var(--gh-fg);
+}
+
+/* Tame the starter's global scrollbar for the demo surface. */
+.gh-page ::-webkit-scrollbar-thumb {
+  background-color: rgb(140 148 159 / 0.4);
+}
+/* ---- Panel: radius + solid-mode override -----------------------------
+   Demo panels carry `.glass-surface` (from the starter) so they inherit the
+   real lens. These rules give them a GitHub-ish 16px radius and provide the
+   opaque variant when the surface is switched to `solid`.
+   Specificity (0,2,0) intentionally beats the starter's `.glass-surface`. */
+.gh-panel {
+  border-radius: 16px;
+}
+
+[data-surface='solid'] .gh-panel {
+  background-color: rgb(255 255 255 / 0.88);
+  background-image: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-color: var(--gh-line);
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 0.06),
+    0 10px 30px -18px rgb(15 23 42 / 0.25);
+}
+
+.dark [data-surface='solid'] .gh-panel {
+  background-color: rgb(22 27 34 / 0.92);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.4),
+    0 10px 30px -18px rgb(0 0 0 / 0.6);
+}
+
+[data-surface='solid'] .gh-panel::before {
+  display: none;
+}
